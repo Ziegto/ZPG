@@ -131,7 +131,7 @@
     </ItemDefinitionGroup>
     <ItemGroup>
         <ClCompile Include="AbstractObject.cpp" />
-        <ClCompile Include="App.cpp"/>
+        <ClCompile Include="App.cpp" />
         <ClCompile Include="AssimpObject.cpp" />
         <ClCompile Include="Camera.cpp"/>
         <ClCompile Include="ComposedTransform.cpp"/>
@@ -155,7 +155,7 @@
     <ItemGroup>
         <ClInclude Include="AbstractObject.h" />
         <ClInclude Include="AbstractTransform.h"/>
-        <ClInclude Include="App.h"/>
+        <ClInclude Include="App.h" />
         <ClInclude Include="AssimpObject.h" />
         <ClInclude Include="Camera.h"/>
         <ClInclude Include="ComposedTransform.h"/>

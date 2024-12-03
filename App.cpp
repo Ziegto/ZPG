@@ -1,4 +1,4 @@
-#include "App.h"
+﻿#include "App.h"
 #include "./Models/tree.h"
 #include "./Models/bushes.h"
 #include "./Models/sphere.h"
@@ -163,34 +163,6 @@ Scene* App::createSceneWithModels(const std::vector<std::pair<DrawableObject*, C
 
 void App::createModels()
 {
-    GLuint textureID = SOIL_load_OGL_texture(
-        "./Structures/wooden_fence.png",
-        SOIL_LOAD_RGBA,
-        SOIL_CREATE_NEW_ID,
-        SOIL_FLAG_INVERT_Y
-    );
-
-    GLuint textureID2 = SOIL_load_OGL_texture(
-        "./Structures/grass.png",
-        SOIL_LOAD_RGBA,
-        SOIL_CREATE_NEW_ID,
-        SOIL_FLAG_INVERT_Y
-    );
-
-    GLuint textureID3 = SOIL_load_OGL_texture(
-        "./Structures/house.png",
-        SOIL_LOAD_RGBA,
-        SOIL_CREATE_NEW_ID,
-        SOIL_FLAG_INVERT_Y
-    );
-
-    GLuint textureID4 = SOIL_load_OGL_texture(
-        "./Structures/zombie.png",
-        SOIL_LOAD_RGBA,
-        SOIL_CREATE_NEW_ID,
-        SOIL_FLAG_INVERT_Y
-    );
-
     std::vector<Light*> scene1Lights = {light, light3, light4};
     std::vector<Light*> scene2Lights = {light, light5, light4};
     std::vector<Light*> scene4Lights = {light, light4};
@@ -218,7 +190,7 @@ void App::createModels()
     
     //les
     auto drawablePlain = new DrawableObject(plainModelInstance, shaderLambert);
-    drawablePlain->setTexture(textureID2, 0);
+    drawablePlain->setTexture(0, "./Structures/grass.png");
     drawablePlain->setMaterial(glowingMaterial);
     auto plainTransform = new ComposedTransform();
     plainTransform->addTransform(new Translation(glm::vec3(0.f, -1.0f, 0.f)));
@@ -227,7 +199,7 @@ void App::createModels()
     scene1Models.push_back(std::make_pair(drawablePlain, plainTransform));
 
     auto drawableHouse = new DrawableObject(assimpModelInstance, shaderLambert);
-    drawableHouse->setTexture(textureID3, 1);
+    drawableHouse->setTexture(1, "./Structures/house.png");
     drawableHouse->setMaterial(glowingMaterial);
     auto houseTransform = new ComposedTransform();
     houseTransform->addTransform(new Translation(glm::vec3(0.f, -1.0f, 0.f)));
@@ -236,7 +208,7 @@ void App::createModels()
     scene1Models.push_back(std::make_pair(drawableHouse, houseTransform));
 
     auto drawableLogin = new DrawableObject(assimpModelLoginInstance, shaderLambert);
-    drawableLogin->setTexture(textureID, 2);
+    drawableLogin->setTexture(2, "./Structures/wooden_fence.png");
     drawableLogin->setMaterial(glowingMaterial);
     auto loginTransform = new ComposedTransform();
     loginTransform->addTransform(new Scale(glm::vec3(0.5f, 0.5f, 0.5f)));
@@ -345,15 +317,15 @@ void App::createModels()
     drawableObject2->setTransformation(transform2);
     scene4Models.push_back(std::make_pair(drawableObject2, transform2));
     //..3
-    auto drawableObject3 = new DrawableObject(plainModelInstance, shaderLambert);
-    drawableObject3->setTexture(textureID2, 0);
-    drawableObject3->setMaterial(glowingMaterial);
-    auto transform3 = new ComposedTransform();
-    transform3->addTransform(new Translation(glm::vec3(6.f, -0.5f, 0.f)));
-    transform3->addTransform(new Scale(glm::vec3(1.5f, 1.5f, 1.5f)));
-    transform3->addTransform(new DynamicRotation(45.0f, glm::vec3(0.0f, 1.0f, 0.0f)));
-    drawableObject3->setTransformation(transform3);
-    scene4Models.push_back(std::make_pair(drawableObject3, transform3));
+    // auto drawableObject3 = new DrawableObject(plainModelInstance, shaderLambert);
+    // drawableObject3->setTexture(4, "./Structures/wooden_fence.png");
+    // drawableObject3->setMaterial(glowingMaterial);
+    // auto transform3 = new ComposedTransform();
+    // transform3->addTransform(new Translation(glm::vec3(6.f, -0.5f, 0.f)));
+    // transform3->addTransform(new Scale(glm::vec3(1.5f, 1.5f, 1.5f)));
+    // transform3->addTransform(new DynamicRotation(45.0f, glm::vec3(0.0f, 1.0f, 0.0f)));
+    // drawableObject3->setTransformation(transform3);
+    // scene4Models.push_back(std::make_pair(drawableObject3, transform3));
     //..4
     auto drawableObject4 = new DrawableObject(treeModelInstance, shaderConstant);
     drawableObject4->setMaterial(glowingMaterial);

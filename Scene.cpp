@@ -84,9 +84,16 @@ void Scene::draw() {
             currentShader->setUniform3("material.rs", material->rs);
         }
 
+        GLuint textureUnit = object->getTextureUnit();
+        GLuint textureID = object->getTextureID();
+        glActiveTexture(GL_TEXTURE0 + textureUnit);
+        glBindTexture(GL_TEXTURE_2D, textureID);
+        currentShader->setUniform1("textureUnitID", textureUnit);
+
         object->draw(modes[i], starts[i], counts[i]);
     }
 }
+
 
 DrawableObject* Scene::getObject(int index)
 {

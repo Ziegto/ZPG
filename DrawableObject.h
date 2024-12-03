@@ -23,11 +23,13 @@ public:
 
     void setSkyCube(SkyCube* skyCube);
     
-    void setTexture(GLuint textureID, GLuint textureUnit);
+    void setTexture(GLuint textureUnit, string path);
     void setMaterial(Material* material);
     Material* getMaterial() const;
 
     GLuint getTextureUnit() const { return textureUnit; }
+    GLuint getTextureID() const { return textureID; }
+
     
 protected:
     AbstractObject* model;

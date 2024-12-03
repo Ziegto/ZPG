@@ -23,6 +23,11 @@ void ShaderProgram::setUniform3(const char* name, const glm::vec3& vector) {
     glUniform3fv(glGetUniformLocation(programID, name), 1, glm::value_ptr(vector));
 }
 
+void ShaderProgram::setUniform1(const char* name, int value) {
+    glUniform1i(glGetUniformLocation(programID, name), value);
+}
+
+
 void ShaderProgram::setUniform4(const char* name, const glm::vec4& vector) {
     glUniform4fv(glGetUniformLocation(programID, name), 1, glm::value_ptr(vector));
 }

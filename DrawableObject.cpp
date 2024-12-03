@@ -1,4 +1,7 @@
 #include "DrawableObject.h"
+
+#include <SOIL.h>
+
 #include "Model.h"
 
 DrawableObject::DrawableObject(AbstractObject* model, ShaderProgram* shader)
@@ -11,9 +14,24 @@ DrawableObject::DrawableObject(GLuint vao, ShaderProgram* shader)
 {
 }
 
-void DrawableObject::setTexture(GLuint textureID, GLuint textureUnit) {
-    this->textureID = textureID;
+void DrawableObject::setTexture(GLuint textureUnit, string path) {
     this->textureUnit = textureUnit;
+
+    this->textureID = SOIL_load_OGL_texture(
+        path.c_str(),
+        SOIL_LOAD_RGBA,
+        SOIL_CREATE_NEW_ID,
+        SOIL_FLAG_INVERT_Y
+    );
+
+    if (this->textureID == 0) {
+        std::cerr << "Failed to load texture: " << path << std::endl;
+        return;
+    }
+
+    glBindTexture(GL_TEXTURE_2D, this->textureID);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 }
 
 
@@ -37,12 +55,6 @@ ComposedTransform* DrawableObject::getTransformation()
 
 void DrawableObject::draw(GLenum mode, int start, int count) {
     shader->use();
-    glActiveTexture(GL_TEXTURE + textureUnit);
-    glBindTexture(GL_TEXTURE_2D, textureID);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-    shader->setUniform("textureUnitID", textureUnit);
     model->draw();
 }
 

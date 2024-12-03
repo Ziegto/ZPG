@@ -21,7 +21,9 @@ class ShaderProgram : public Observer
 public:
     ShaderProgram(const char* vertexPath, const char* fragmentPath);
     void use();
+    
     void setUniform(const char* name, const glm::mat4& matrix);
+    void setUniform1(const char* name, int value);
     void setUniform3(const char* name, const glm::vec3& vector);
     void setUniform4(const char* name, const glm::vec4& vector);
 
@@ -30,7 +32,6 @@ public:
     void setViewMatrix(const glm::mat4& matrix);
     void setProjectionMatrix(const glm::mat4& matrix);
     void setNumberLights(int number) const;
-
     void setLights(std::vector<Light*> lights);
 
 private:
