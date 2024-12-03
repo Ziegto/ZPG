@@ -135,6 +135,7 @@
         <ClCompile Include="AssimpObject.cpp" />
         <ClCompile Include="Camera.cpp"/>
         <ClCompile Include="ComposedTransform.cpp"/>
+        <ClCompile Include="ModelFactory.cpp" />
         <ClCompile Include="SkyCube.cpp" />
         <ClCompile Include="Drawable.cpp" />
         <ClCompile Include="DrawableObject.cpp"/>
@@ -159,6 +160,7 @@
         <ClInclude Include="AssimpObject.h" />
         <ClInclude Include="Camera.h"/>
         <ClInclude Include="ComposedTransform.h"/>
+        <ClInclude Include="ModelFactory.h" />
         <ClInclude Include="SkyCube.h" />
         <ClInclude Include="Drawable.h" />
         <ClInclude Include="DrawableObject.h"/>

@@ -14,6 +14,7 @@
 #include "DynamicRotation.h"
 #include "DynamicTranslation.h"
 #include "Material.h"
+#include "ModelFactory.h"
 #include "TextureObject.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
@@ -167,26 +168,25 @@ void App::createModels()
     std::vector<Light*> scene2Lights = {light, light5, light4};
     std::vector<Light*> scene4Lights = {light, light4};
 
-    Model* treeModelInstance = new Model(tree, sizeof(tree) / sizeof(tree[0]));
-    Model* bushModelInstance = new Model(bushes, sizeof(bushes) / sizeof(bushes[0]));
-    Model* triangleModelInstace = new Model(triangle, sizeof(triangle) / sizeof(triangle[0]));
-    Model* sphereModelInstance = new Model(sphere, sizeof(sphere) / sizeof(sphere[0]));
-    Model* suziModelInstance = new Model(suziSmooth, sizeof(suziSmooth) / sizeof(suziSmooth[0]));
-    Model* plainModelInstance = new TextureObject(plain, sizeof(plain) / sizeof(plain[0]));
-    SkyCube* skycubeModelInstance = new SkyCube(skycube, sizeof(skycube) / sizeof(skycube[0]));
-    AssimpObject* assimpModelInstance = new AssimpObject("./3DModels/house.obj", GL_TRIANGLES);
-    AssimpObject* assimpModelLoginInstance = new AssimpObject("./3DModels/login.obj", GL_TRIANGLES);
-    // AssimpObject* assimpModelAxeInstance = new AssimpObject("./3DModels/zombie.obj", GL_TRIANGLES);
+    ModelFactory modelFactory;
 
-
-    // auto drawableSkyCube = new DrawableObject(skycubeModelInstance, shaderSkyCube);
-    // // drawableSkyCube->setTexture(skycubeTexture, 0);
-    // drawableSkyCube->setMaterial(glowingMaterial);
-    // auto skyCubeTransform = new ComposedTransform();
-    // skyCubeTransform->addTransform(new Translation(glm::vec3(0.f, 1.0f, 0.f)));
-    // // skyCubeTransform->addTransform(new Scale(glm::vec3(100.f, 100.f, 100.f)));
-    // drawableSkyCube->setTransformation(skyCubeTransform);
-    // scene1Models.push_back(std::make_pair(drawableSkyCube, skyCubeTransform));
+    AbstractObject* treeModelInstance = dynamic_cast<Model*>(modelFactory.createModel(BASIC, tree, sizeof(tree) / sizeof(tree[0])));
+    AbstractObject* bushModelInstance = dynamic_cast<Model*>(modelFactory.createModel(BASIC, bushes, sizeof(bushes) / sizeof(bushes[0])));
+    AbstractObject* triangleModelInstace = dynamic_cast<Model*>(modelFactory.createModel(BASIC, triangle, sizeof(triangle) / sizeof(triangle[0])));
+    AbstractObject* sphereModelInstance = dynamic_cast<Model*>(modelFactory.createModel(BASIC, sphere, sizeof(sphere) / sizeof(sphere[0])));
+    AbstractObject* suziModelInstance = dynamic_cast<Model*>(modelFactory.createModel(BASIC, suziSmooth, sizeof(suziSmooth) / sizeof(suziSmooth[0])));
+    AbstractObject* plainModelInstance = dynamic_cast<TextureObject*>(modelFactory.createModel(TEXTURE, plain, sizeof(plain) / sizeof(plain[0])));
+    AbstractObject* assimpModelInstance = dynamic_cast<AssimpObject*>(modelFactory.createModel("./3DModels/house.obj", GL_TRIANGLES));
+    AbstractObject* assimpModelLoginInstance = dynamic_cast<AssimpObject*>(modelFactory.createModel("./3DModels/login.obj", GL_TRIANGLES));
+    
+    // AbstractObject* treeModelInstance = (ModelFactory::createModel(BASIC, tree, sizeof(tree) / sizeof(tree[0])));
+    // AbstractObject* bushModelInstance = (ModelFactory::createModel(BASIC, bushes, sizeof(bushes) / sizeof(bushes[0])));
+    // AbstractObject* triangleModelInstace = (ModelFactory::createModel(BASIC, triangle, sizeof(triangle) / sizeof(triangle[0])));
+    // AbstractObject* sphereModelInstance = (ModelFactory::createModel(BASIC, sphere, sizeof(sphere) / sizeof(sphere[0])));
+    // AbstractObject* suziModelInstance = (ModelFactory::createModel(BASIC, suziSmooth, sizeof(suziSmooth) / sizeof(suziSmooth[0])));
+    // AbstractObject* plainModelInstance = (ModelFactory::createModel(TEXTURE, plain, sizeof(plain) / sizeof(plain[0])));
+    // AbstractObject* assimpModelInstance = (ModelFactory::createModel("./3DModels/house.obj", GL_TRIANGLES));
+    // AbstractObject* assimpModelLoginInstance = (ModelFactory::createModel("./3DModels/login.obj", GL_TRIANGLES));
     
     //les
     auto drawablePlain = new DrawableObject(plainModelInstance, shaderLambert);
