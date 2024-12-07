@@ -113,7 +113,8 @@ void App::createShaders()
 
     matteMaterial = new Material(glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.7f, 0.5f, 0.5f), glm::vec3(0.0f, 0.0f, 0.0f));
     shinyMaterial = new Material(glm::vec3(0.3f, 0.3f, 0.3f), glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(1.0f, 1.0f, 1.0f));
-    glowingMaterial = new Material(glm::vec3(0.5f, 0.5f, 0.2f), glm::vec3(0.9f, 0.9f, 0.5f), glm::vec3(2.0f, 2.0f, 1.0f));
+    glowingMaterial = new Material(glm::vec3(0.5f, 0.5f, 0.2f), glm::vec3(0.9f, 0.9f, 0.5f),
+                                   glm::vec3(2.0f, 2.0f, 1.0f));
 
     light->attach(shaderLambert);
     light->attach(shaderConstant);
@@ -146,7 +147,8 @@ void App::createShaders()
     light5->attach(shaderSkyCube);
 }
 
-Scene* App::createSceneWithModels(const std::vector<std::pair<DrawableObject*, ComposedTransform*>>& models, const std::vector<Light*>& lights)
+Scene* App::createSceneWithModels(const std::vector<std::pair<DrawableObject*, ComposedTransform*>>& models,
+                                  const std::vector<Light*>& lights)
 {
     auto scene = new Scene(camera);
 
@@ -172,14 +174,22 @@ void App::createModels()
 
     ModelFactory modelFactory;
 
-    AbstractObject* treeModelInstance = dynamic_cast<Model*>(modelFactory.createModel(BASIC, tree, sizeof(tree) / sizeof(tree[0])));
-    AbstractObject* bushModelInstance = dynamic_cast<Model*>(modelFactory.createModel(BASIC, bushes, sizeof(bushes) / sizeof(bushes[0])));
-    AbstractObject* triangleModelInstace = dynamic_cast<Model*>(modelFactory.createModel(BASIC, triangle, sizeof(triangle) / sizeof(triangle[0])));
-    AbstractObject* sphereModelInstance = dynamic_cast<Model*>(modelFactory.createModel(BASIC, sphere, sizeof(sphere) / sizeof(sphere[0])));
-    AbstractObject* suziModelInstance = dynamic_cast<Model*>(modelFactory.createModel(BASIC, suziSmooth, sizeof(suziSmooth) / sizeof(suziSmooth[0])));
-    AbstractObject* plainModelInstance = dynamic_cast<TextureObject*>(modelFactory.createModel(TEXTURE, plain, sizeof(plain) / sizeof(plain[0])));
-    AbstractObject* assimpModelInstance = dynamic_cast<AssimpObject*>(modelFactory.createModel("./3DModels/house.obj", GL_TRIANGLES));
-    AbstractObject* assimpModelLoginInstance = dynamic_cast<AssimpObject*>(modelFactory.createModel("./3DModels/login.obj", GL_TRIANGLES));
+    AbstractObject* treeModelInstance = dynamic_cast<Model*>(modelFactory.createModel(
+        BASIC, tree, sizeof(tree) / sizeof(tree[0])));
+    AbstractObject* bushModelInstance = dynamic_cast<Model*>(modelFactory.createModel(
+        BASIC, bushes, sizeof(bushes) / sizeof(bushes[0])));
+    AbstractObject* triangleModelInstace = dynamic_cast<Model*>(modelFactory.createModel(
+        BASIC, triangle, sizeof(triangle) / sizeof(triangle[0])));
+    AbstractObject* sphereModelInstance = dynamic_cast<Model*>(modelFactory.createModel(
+        BASIC, sphere, sizeof(sphere) / sizeof(sphere[0])));
+    AbstractObject* suziModelInstance = dynamic_cast<Model*>(modelFactory.createModel(
+        BASIC, suziSmooth, sizeof(suziSmooth) / sizeof(suziSmooth[0])));
+    AbstractObject* plainModelInstance = dynamic_cast<TextureObject*>(modelFactory.createModel(
+        TEXTURE, plain, sizeof(plain) / sizeof(plain[0])));
+    AbstractObject* assimpModelInstance = dynamic_cast<AssimpObject*>(modelFactory.createModel(
+        "./3DModels/house.obj", GL_TRIANGLES));
+    AbstractObject* assimpModelLoginInstance = dynamic_cast<AssimpObject*>(modelFactory.createModel(
+        "./3DModels/login.obj", GL_TRIANGLES));
 
     //les
     auto drawablePlain = new DrawableObject(plainModelInstance, shaderLambert);
@@ -208,24 +218,24 @@ void App::createModels()
     loginTransform->addTransform(new Translation(glm::vec3(10.f, 0.f, 0.f)));
     drawableLogin->setTransformation(loginTransform);
     scene1Models.push_back(std::make_pair(drawableLogin, loginTransform));
-    
+
     for (int i = 0; i < 50; i++)
     {
         auto drawableTree = new DrawableObject(treeModelInstance, shaderPhong);
         drawableTree->setMaterial(glowingMaterial);
-    
+
         auto treeTransform = new ComposedTransform();
-    
+
         float treeX = static_cast<float>(rand()) / (RAND_MAX / 60.0f) - 30.0f;
         float treeZ = static_cast<float>(rand()) / (RAND_MAX / 60.0f) - 30.0f;
         float treeScale = 0.1f + static_cast<float>(rand()) / (RAND_MAX / (0.5f - 0.1f));
-    
+
         treeTransform->addTransform(new Translation(glm::vec3(treeX, -1.0f, treeZ)));
         treeTransform->addTransform(new Scale(glm::vec3(treeScale, treeScale, treeScale)));
         drawableTree->setTransformation(treeTransform);
         scene1Models.push_back(std::make_pair(drawableTree, treeTransform));
     }
-    
+
     for (int i = 0; i < 15; i++)
     {
         auto drawableHmyz = new DrawableObject(sphereModelInstance, shaderPhong);
@@ -237,38 +247,52 @@ void App::createModels()
         hmyzTransform->addTransform(new Scale(glm::vec3(0.2f, 0.2f, 0.2f)));
         hmyzTransform->addTransform(new DynamicTranslation(-10.f, 10.f, -10.f, 10.f, -10.f, 10.f, 5.f));
         drawableHmyz->setTransformation(hmyzTransform);
-    
+
         scene1Models.push_back(std::make_pair(drawableHmyz, hmyzTransform));
     }
-    
+
     for (int i = 0; i < 30; i++)
     {
         auto drawableBush = new DrawableObject(bushModelInstance, shaderPhong);
         drawableBush->setMaterial(glowingMaterial);
         auto bushTransform = new ComposedTransform();
-    
+
         float bushX = static_cast<float>(rand()) / (RAND_MAX / 60.0f) - 30.0f;
         float bushZ = static_cast<float>(rand()) / (RAND_MAX / 60.0f) - 30.0f;
         float bushScale = 0.1f + static_cast<float>(rand()) / (RAND_MAX / (0.5f - 0.1f));
-    
+
         bushTransform->addTransform(new Translation(glm::vec3(bushX, -1.0f, bushZ)));
         bushTransform->addTransform(new Scale(glm::vec3(2.f, 2.f, 2.f)));
-    
+
         drawableBush->setTransformation(bushTransform);
         scene1Models.push_back(std::make_pair(drawableBush, bushTransform));
     }
     Scene* scene1 = createSceneWithModels(scene1Models, scene1Lights);
     scenes.push_back(scene1);
-    
 
-    //BEZIER
-     auto drawableSphere = new DrawableObject(sphereModelInstance, shaderPhong);
-     drawableSphere->setMaterial(glowingMaterial);
-     auto sphereTransform = new ComposedTransform();
-     sphereTransform->addTransform(new Translation(glm::vec3(3 - 1.5f, 3 - 1.5f, 0.5f)));
-     drawableSphere->setTransformation(sphereTransform);
-     scene2Models.push_back(std::make_pair(drawableSphere, sphereTransform));
-    
+
+    // 4 koule
+    for (int i = 0; i < 4; i++)
+    {
+        auto drawableSphere = new DrawableObject(sphereModelInstance, shaderPhong);
+        drawableSphere->setMaterial(glowingMaterial);
+        auto sphereTransform = new ComposedTransform();
+
+        Bezier* bezierTranslate = new Bezier(0.01f, 0.5f, glm::mat4(glm::vec4(-10.0, 30.0, -30.0, 1.0),
+        glm::vec4(30.0, -60.0, 30.0, 0),
+        glm::vec4(-30.0, 30.0, 0, 0),
+        glm::vec4(1, 0, 0, 0)), glm::mat4x3(glm::vec3(-1, 0, 0),
+        glm::vec3(0, 1, 0),
+        glm::vec3(0, -1, 0),
+        glm::vec3(1, 0, 0)));
+
+        
+        sphereTransform->addTransform(bezierTranslate);
+        sphereTransform->addTransform(new Translation(glm::vec3((i % 2) * 3 - 1.5f, (i / 2) * 3 - 1.5f, 0.5f)));
+        drawableSphere->setTransformation(sphereTransform);
+        scene2Models.push_back(std::make_pair(drawableSphere, sphereTransform));
+    }
+
     Scene* scene2 = createSceneWithModels(scene2Models, scene2Lights);
     scenes.push_back(scene2);
 
@@ -319,7 +343,7 @@ void App::createModels()
     scene4Models.push_back(std::make_pair(drawableObject4, transform4));
     Scene* scene4 = createSceneWithModels(scene4Models, scene4Lights);
     scenes.push_back(scene4);
-    
+
     currentScene = scenes[2];
 }
 
@@ -389,7 +413,6 @@ void App::processInput()
         escKeyWasPressed = false; // Reset, když ESC není stisknutá
     }
 }
-
 
 
 void App::mouseCallback(double xpos, double ypos)
