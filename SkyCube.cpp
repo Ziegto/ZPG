@@ -29,10 +29,22 @@ SkyCube::SkyCube(const float* vertices, size_t vertexCount): Model(vertices, ver
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 }
 
+void SkyCube::setSkyCubeBuffer(int buffer)
+{
+    this->buffer = buffer;
+}
+
 void SkyCube::draw()
 {
-    glDepthMask(GL_FALSE);
-    glBindVertexArray(VAO);
-    glDrawArrays(GL_TRIANGLES, 0,vertexCount);
-    glDepthMask(GL_TRUE);
+    if (buffer == 0)
+    {
+        glDepthMask(GL_FALSE);
+        glBindVertexArray(VAO);
+        glDrawArrays(GL_TRIANGLES, 0,vertexCount);
+        glDepthMask(GL_TRUE);
+    }else
+    {
+        glBindVertexArray(VAO);
+        glDrawArrays(GL_TRIANGLES, 0,vertexCount);
+    }
 }

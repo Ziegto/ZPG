@@ -10,6 +10,7 @@
 #include <iomanip>
 
 #include "AssimpObject.h"
+#include "Bezier.h"
 #include "SkyCube.h"
 #include "DynamicRotation.h"
 #include "DynamicTranslation.h"
@@ -24,6 +25,7 @@ Camera* camera;
 Material* matteMaterial;
 Material* shinyMaterial;
 Material* glowingMaterial;
+bool pressed = false;
 
 App::App()
 {
@@ -258,17 +260,15 @@ void App::createModels()
     Scene* scene1 = createSceneWithModels(scene1Models, scene1Lights);
     scenes.push_back(scene1);
     
+
+    //BEZIER
+     auto drawableSphere = new DrawableObject(sphereModelInstance, shaderPhong);
+     drawableSphere->setMaterial(glowingMaterial);
+     auto sphereTransform = new ComposedTransform();
+     sphereTransform->addTransform(new Translation(glm::vec3(3 - 1.5f, 3 - 1.5f, 0.5f)));
+     drawableSphere->setTransformation(sphereTransform);
+     scene2Models.push_back(std::make_pair(drawableSphere, sphereTransform));
     
-    //4 koule
-    for (int i = 0; i < 4; i++)
-    {
-        auto drawableSphere = new DrawableObject(sphereModelInstance, shaderPhong);
-        drawableSphere->setMaterial(glowingMaterial);
-        auto sphereTransform = new ComposedTransform();
-        sphereTransform->addTransform(new Translation(glm::vec3((i % 2) * 3 - 1.5f, (i / 2) * 3 - 1.5f, 0.5f)));
-        drawableSphere->setTransformation(sphereTransform);
-        scene2Models.push_back(std::make_pair(drawableSphere, sphereTransform));
-    }
     Scene* scene2 = createSceneWithModels(scene2Models, scene2Lights);
     scenes.push_back(scene2);
 
@@ -338,6 +338,24 @@ void App::switchScene(int sceneIndex)
 
 void App::processInput()
 {
+    static bool fKeyWasPressed = false; // Stav klávesy F
+    static bool escKeyWasPressed = false; // Stav klávesy ESC
+
+    // Zpracování klávesy F (jednorázová akce)
+    if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
+    {
+        if (!fKeyWasPressed) // Pokud nebyla předtím stisknuta
+        {
+            currentScene->setFreezeSkyCube();
+            fKeyWasPressed = true;
+        }
+    }
+    else
+    {
+        fKeyWasPressed = false; // Reset, když F není stisknutá
+    }
+
+    // Zpracování pohybu (opakující se akce při držení kláves)
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         camera->moveForward();
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
@@ -347,21 +365,31 @@ void App::processInput()
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         camera->moveRight();
 
+    // Zpracování ESC (přepínání zachycení myši)
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     {
-        isMouseCaptured = !isMouseCaptured;
+        if (!escKeyWasPressed) // Pokud nebyla předtím stisknuta
+        {
+            isMouseCaptured = !isMouseCaptured;
 
-        if (isMouseCaptured)
-        {
-            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-            glfwSetCursorPos(window, 1200 / 2, 1000 / 2);
-        }
-        else
-        {
-            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            if (isMouseCaptured)
+            {
+                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+                glfwSetCursorPos(window, 1200 / 2, 1000 / 2);
+            }
+            else
+            {
+                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            }
+            escKeyWasPressed = true;
         }
     }
+    else
+    {
+        escKeyWasPressed = false; // Reset, když ESC není stisknutá
+    }
 }
+
 
 
 void App::mouseCallback(double xpos, double ypos)

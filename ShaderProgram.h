@@ -24,6 +24,7 @@ public:
     
     void setUniform(const char* name, const glm::mat4& matrix);
     void setUniform1(const char* name, int value);
+    void setUniformSkyCube(const char* name, int value);
     void setUniform3(const char* name, const glm::vec3& vector);
     void setUniform4(const char* name, const glm::vec4& vector);
 

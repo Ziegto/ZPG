@@ -133,6 +133,7 @@
         <ClCompile Include="AbstractObject.cpp" />
         <ClCompile Include="App.cpp" />
         <ClCompile Include="AssimpObject.cpp" />
+        <ClCompile Include="Bezier.cpp" />
         <ClCompile Include="Camera.cpp"/>
         <ClCompile Include="ComposedTransform.cpp"/>
         <ClCompile Include="ModelFactory.cpp" />
@@ -158,6 +159,7 @@
         <ClInclude Include="AbstractTransform.h"/>
         <ClInclude Include="App.h" />
         <ClInclude Include="AssimpObject.h" />
+        <ClInclude Include="Bezier.h" />
         <ClInclude Include="Camera.h"/>
         <ClInclude Include="ComposedTransform.h"/>
         <ClInclude Include="ModelFactory.h" />
@@ -225,6 +227,8 @@
         <Content Include="Structures\zombie.png" />
         <Content Include="test_frag.glsl" />
         <Content Include="test_vert.glsl" />
+        <Content Include="tree.obj" />
+        <Content Include="tree.png" />
     </ItemGroup>
     <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
     <ImportGroup Label="ExtensionTargets">

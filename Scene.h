@@ -23,6 +23,7 @@ public:
 
     void setSkyEnabled(bool enabled);
 
+    void setFreezeSkyCube();
 
 private:
     std::vector<DrawableObject*> objects;
@@ -39,4 +40,5 @@ private:
     SkyCube* skyCube;
     DrawableObject* skyCubeDrawable;
     ShaderProgram* shaderSkyCube;
+    int freezeSkyCube = 0;
 };

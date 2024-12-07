@@ -2,12 +2,12 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "SkyCube.h"
+#include "Translation.h"
 #include "Models/skycube.h"
 
 
 Scene::Scene(Camera* cam) : camera(cam)
 {
-   
 }
 
 Scene::~Scene()
@@ -40,7 +40,7 @@ std::vector<ComposedTransform*> Scene::getTransforms() const
 
 void Scene::initLight()
 {
-    for(int i = 0; i < lights.size(); i++)
+    for (int i = 0; i < lights.size(); i++)
     {
         lights[i]->setId(i);
         lights[i]->notify();
@@ -62,12 +62,36 @@ void Scene::setSkyEnabled(bool enabled)
     sky = enabled;
 }
 
-void Scene::draw() {
-    if (sky) {
-        skyCubeDrawable->draw(GL_TRIANGLES, 0, 36);
+void Scene::setFreezeSkyCube()
+{
+    if (freezeSkyCube == 0)
+    {
+        freezeSkyCube = 1;
+        skyCube->setSkyCubeBuffer(0);
     }
-    
-    for (size_t i = 0; i < objects.size(); ++i) {
+    else if (freezeSkyCube == 1)
+    {
+        freezeSkyCube = 0;
+        skyCube->setSkyCubeBuffer(1);
+    }
+}
+
+void Scene::draw()
+{
+    if (sky)
+    {
+        ShaderProgram* currentShader = skyCubeDrawable->getShader();
+        skyCubeDrawable->draw(GL_TRIANGLES, 0, 36);
+        auto transform = new ComposedTransform();
+        transform->addTransform(new Translation(glm::vec3(0.0f, -2.0f, 0.0f)));
+        skyCubeDrawable->setTransformation(transform);
+        glm::mat4 modelMatrix = skyCubeDrawable->getModelMatrix();
+        currentShader->setUniformSkyCube("freeze", freezeSkyCube);
+        currentShader->setUniform("modelMatrix", modelMatrix);
+    }
+
+    for (size_t i = 0; i < objects.size(); ++i)
+    {
         DrawableObject* object = objects[i];
         ShaderProgram* currentShader = object->getShader();
         Material* material = object->getMaterial();
@@ -78,7 +102,8 @@ void Scene::draw() {
         glm::mat4 modelMatrix = object->getModelMatrix();
         currentShader->setUniform("modelMatrix", modelMatrix);
 
-        if (material) {
+        if (material)
+        {
             currentShader->setUniform3("material.ra", material->ra);
             currentShader->setUniform3("material.rd", material->rd);
             currentShader->setUniform3("material.rs", material->rs);
