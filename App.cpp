@@ -178,16 +178,7 @@ void App::createModels()
     AbstractObject* plainModelInstance = dynamic_cast<TextureObject*>(modelFactory.createModel(TEXTURE, plain, sizeof(plain) / sizeof(plain[0])));
     AbstractObject* assimpModelInstance = dynamic_cast<AssimpObject*>(modelFactory.createModel("./3DModels/house.obj", GL_TRIANGLES));
     AbstractObject* assimpModelLoginInstance = dynamic_cast<AssimpObject*>(modelFactory.createModel("./3DModels/login.obj", GL_TRIANGLES));
-    
-    // AbstractObject* treeModelInstance = (ModelFactory::createModel(BASIC, tree, sizeof(tree) / sizeof(tree[0])));
-    // AbstractObject* bushModelInstance = (ModelFactory::createModel(BASIC, bushes, sizeof(bushes) / sizeof(bushes[0])));
-    // AbstractObject* triangleModelInstace = (ModelFactory::createModel(BASIC, triangle, sizeof(triangle) / sizeof(triangle[0])));
-    // AbstractObject* sphereModelInstance = (ModelFactory::createModel(BASIC, sphere, sizeof(sphere) / sizeof(sphere[0])));
-    // AbstractObject* suziModelInstance = (ModelFactory::createModel(BASIC, suziSmooth, sizeof(suziSmooth) / sizeof(suziSmooth[0])));
-    // AbstractObject* plainModelInstance = (ModelFactory::createModel(TEXTURE, plain, sizeof(plain) / sizeof(plain[0])));
-    // AbstractObject* assimpModelInstance = (ModelFactory::createModel("./3DModels/house.obj", GL_TRIANGLES));
-    // AbstractObject* assimpModelLoginInstance = (ModelFactory::createModel("./3DModels/login.obj", GL_TRIANGLES));
-    
+
     //les
     auto drawablePlain = new DrawableObject(plainModelInstance, shaderLambert);
     drawablePlain->setTexture(0, "./Structures/grass.png");
@@ -215,15 +206,6 @@ void App::createModels()
     loginTransform->addTransform(new Translation(glm::vec3(10.f, 0.f, 0.f)));
     drawableLogin->setTransformation(loginTransform);
     scene1Models.push_back(std::make_pair(drawableLogin, loginTransform));
-
-    // auto drawableAxe = new DrawableObject(assimpModelAxeInstance, shaderLambert);
-    // drawableAxe->setTexture(textureID4, 2);
-    // drawableAxe->setMaterial(glowingMaterial);
-    // auto axeTransform = new ComposedTransform();
-    // axeTransform->addTransform(new Scale(glm::vec3(0.5f, 0.5f, 0.5f)));
-    // axeTransform->addTransform(new Translation(glm::vec3(4.f, 0.f, 0.f)));
-    // drawableAxe->setTransformation(axeTransform);
-    // scene1Models.push_back(std::make_pair(drawableAxe, axeTransform));
     
     for (int i = 0; i < 50; i++)
     {
