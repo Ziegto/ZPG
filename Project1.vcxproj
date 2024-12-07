@@ -209,7 +209,9 @@
         <Content Include="3DModels\login.obj" />
         <Content Include="3DModels\zombie.obj" />
         <Content Include="PhongFragmentShader.glsl" />
+        <Content Include="phongTextureVertex.glsl" />
         <Content Include="PhongVertexShader.glsl" />
+        <Content Include="phongTextureFragment.glsl" />
         <Content Include="Structures\axe.png" />
         <Content Include="Structures\grass.png" />
         <Content Include="Structures\house.png" />
