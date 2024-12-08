@@ -92,8 +92,6 @@ void Scene::clearLights()
 
 void Scene::draw()
 {
-    
-
     if (sky)
     {
         ShaderProgram* currentShader = skyCubeDrawable->getShader();

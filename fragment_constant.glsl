@@ -25,7 +25,7 @@ uniform Light lights[10];
 uniform int numLights;
 uniform vec3 cameraPosition;
 uniform float specularStrength = 70.0;
-uniform vec4 ambientColor = vec4(0.01, 0.01, 0.01, 1.0);
+uniform vec4 ambientColor = vec4(0.0, 0.0, 0.0, 0.0);
 uniform Material material;
 
 void main(void) {

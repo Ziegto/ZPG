@@ -11,6 +11,7 @@
 
 #include "AssimpObject.h"
 #include "Bezier.h"
+#include "Controller.h"
 #include "SkyCube.h"
 #include "DynamicRotation.h"
 #include "DynamicTranslation.h"
@@ -25,7 +26,7 @@ Camera* camera;
 Material* matteMaterial;
 Material* shinyMaterial;
 Material* glowingMaterial;
-bool pressed = false;
+Controller* controller;
 
 App::App()
 {
@@ -56,49 +57,43 @@ App::~App()
     glfwTerminate();
 }
 
-void App::window_size_callback(GLFWwindow* window, int width, int height)
-{
-    glViewport(0, 0, width, height);
-    camera->updateRation(width, height);
-}
-
 void App::initialization()
 {
     int width, height;
     glfwGetFramebufferSize(window, &width, &height);
     glViewport(0, 0, width, height);
-    glfwSetWindowSizeCallback(window, window_size_callback);
 
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
-    glfwSetMouseButtonCallback(window, [](GLFWwindow* window, int button, int action, int mods)
-    {
-        auto app = static_cast<App*>(glfwGetWindowUserPointer(window));
-        if (app)
-        {
-            app->mouseButtonCallback(button, action, mods);
-        }
-    });
+    controller = new Controller(window, camera, this);
 
     glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xpos, double ypos)
     {
-        auto app = static_cast<App*>(glfwGetWindowUserPointer(window));
-        if (app)
-        {
-            app->mouseCallback(xpos, ypos);
-        }
+        auto appController = static_cast<Controller*>(glfwGetWindowUserPointer(window));
+        appController->mouseCallback(xpos, ypos);
     });
 
-    glfwSetWindowUserPointer(window, this);
+    glfwSetMouseButtonCallback(window, [](GLFWwindow* window, int button, int action, int mods)
+    {
+        auto appController = static_cast<Controller*>(glfwGetWindowUserPointer(window));
+        appController->mouseButtonCallback(button, action, mods);
+    });
+
+    glfwSetWindowSizeCallback(window, [](GLFWwindow* window, int width, int height)
+    {
+        auto appController = static_cast<Controller*>(glfwGetWindowUserPointer(window));
+        appController->windowSizeCallback(width, height);
+    });
+
+    glfwSetWindowUserPointer(window, controller);
 }
 
 void App::createLights()
 {
-    light = new Light(glm::vec3(1.0f, 1.0f, 2.0f), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f), 0);
-    light2 = new Light(glm::vec3(0.f, 0.f, 0.f), glm::vec4(0.2f, 0.2f, 0.2f, 1.0f), 0);
-    light3 = new Light(glm::vec3(0.0f, 0.0f, 2.0f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), 0);
-    light4 = new Light(glm::vec3(0.0f, 0.0f, 2.0f), glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), 0);
-    light5 = new Light(glm::vec3(0.0f, 0.0f, 2.0f), glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), 0);
+    light = new Light(glm::vec3(1.0f, 1.0f, 2.0f), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f), 1);
+    light2 = new Light(glm::vec3(0.f, 0.f, 0.f), glm::vec4(0.2f, 0.2f, 0.2f, 1.0f), 1);
+    light3 = new Light(glm::vec3(0.0f, 0.0f, 2.0f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), 1);
+    light4 = new Light(glm::vec3(0.0f, 0.0f, 2.0f), glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), 1);
+    light5 = new Light(glm::vec3(0.0f, 0.0f, 2.0f), glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), 1);
+    flashlight = new Light(glm::vec3(0.0f, 0.0f, 2.0f), glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), 1);
 }
 
 
@@ -110,41 +105,28 @@ void App::createShaders()
     shaderBlinn = new ShaderProgram("vertex_blinn.glsl", "fragment_blinn.glsl");
     shaderConstant = new ShaderProgram("vertex_constant.glsl", "fragment_constant.glsl");
     shaderSkyCube = new ShaderProgram("PhongVertexShader.glsl", "PhongFragmentShader.glsl");
+    shaderPhongNight = new ShaderProgram("vertex_night.glsl", "fragment_night.glsl");
 
-    matteMaterial = new Material(glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.7f, 0.5f, 0.5f), glm::vec3(0.0f, 0.0f, 0.0f));
+     matteMaterial = new Material(glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.7f, 0.5f, 0.5f), glm::vec3(0.0f, 0.0f, 0.0f));
     shinyMaterial = new Material(glm::vec3(0.3f, 0.3f, 0.3f), glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(1.0f, 1.0f, 1.0f));
-    glowingMaterial = new Material(glm::vec3(0.5f, 0.5f, 0.2f), glm::vec3(0.9f, 0.9f, 0.5f),
-                                   glm::vec3(2.0f, 2.0f, 1.0f));
+    glowingMaterial = new Material(glm::vec3(0.2f, 0.2f, 0.2f), glm::vec3(0.9f, 0.9f, 0.5f),
+                                   glm::vec3(0.f, 0.f,0.f));
 
-    light->attach(shaderLambert);
-    light->attach(shaderConstant);
-    light->attach(shaderPhong);
-    light->attach(shaderBlinn);
-    light->attach(shaderSkyCube);
+}
 
-    light2->attach(shaderLambert);
-    light2->attach(shaderPhong);
-    light2->attach(shaderBlinn);
-    light2->attach(shaderConstant);
-    light2->attach(shaderSkyCube);
+void App::attachLightsToShaders()
+{
+    std::vector<Light*> lights = {flashlight};
 
-    light3->attach(shaderLambert);
-    light3->attach(shaderPhong);
-    light3->attach(shaderBlinn);
-    light3->attach(shaderConstant);
-    light3->attach(shaderSkyCube);
+    std::vector<ShaderProgram*> shaders = {shaderLambert, shaderConstant, shaderPhong, shaderBlinn, shaderSkyCube, shaderPhongNight};
 
-    light4->attach(shaderLambert);
-    light4->attach(shaderPhong);
-    light4->attach(shaderBlinn);
-    light4->attach(shaderConstant);
-    light4->attach(shaderSkyCube);
-
-    light5->attach(shaderLambert);
-    light5->attach(shaderPhong);
-    light5->attach(shaderBlinn);
-    light5->attach(shaderConstant);
-    light5->attach(shaderSkyCube);
+    for (auto& l : lights)
+    {
+        for (auto& s : shaders)
+        {
+            l->attach(s);
+        }
+    }
 }
 
 Scene* App::createSceneWithModels(const std::vector<std::pair<DrawableObject*, ComposedTransform*>>& models,
@@ -168,10 +150,11 @@ Scene* App::createSceneWithModels(const std::vector<std::pair<DrawableObject*, C
 
 void App::createModels()
 {
-    std::vector<Light*> scene1Lights = {light, light3, light4};
-    std::vector<Light*> scene2Lights = {light, light5, light4};
-    std::vector<Light*> scene4Lights = {light, light4};
-
+    std::vector<Light*> scene1Lights = {flashlight, light};
+    std::vector<Light*> scene2Lights = {flashlight};
+    std::vector<Light*> scene4Lights = {flashlight};
+    std::vector<Light*> scene5Lights = {flashlight};
+    
     ModelFactory modelFactory;
 
     AbstractObject* treeModelInstance = dynamic_cast<Model*>(modelFactory.createModel(
@@ -190,6 +173,10 @@ void App::createModels()
         "./3DModels/house.obj", GL_TRIANGLES));
     AbstractObject* assimpModelLoginInstance = dynamic_cast<AssimpObject*>(modelFactory.createModel(
         "./3DModels/login.obj", GL_TRIANGLES));
+    AbstractObject* assimpModelZombieInstance = dynamic_cast<AssimpObject*>(modelFactory.createModel(
+        "./3DModels/zombie.obj", GL_TRIANGLES));
+    AbstractObject* assimpModelPenguinInstance = dynamic_cast<AssimpObject*>(modelFactory.createModel(
+        "./3DModels/Penguin.obj", GL_TRIANGLES));
 
     //les
     auto drawablePlain = new DrawableObject(plainModelInstance, shaderLambert);
@@ -343,8 +330,28 @@ void App::createModels()
     scene4Models.push_back(std::make_pair(drawableObject4, transform4));
     Scene* scene4 = createSceneWithModels(scene4Models, scene4Lights);
     scenes.push_back(scene4);
+    
+    for (int i = 0; i < 50; i++)
+    {
+        auto drawableTree = new DrawableObject(treeModelInstance, shaderPhong);
+        drawableTree->setMaterial(matteMaterial);
 
-    currentScene = scenes[2];
+        auto treeTransform = new ComposedTransform();
+
+        float treeX = static_cast<float>(rand()) / (RAND_MAX / 60.0f) - 30.0f;
+        float treeZ = static_cast<float>(rand()) / (RAND_MAX / 60.0f) - 30.0f;
+        float treeScale = 0.1f + static_cast<float>(rand()) / (RAND_MAX / (0.5f - 0.1f));
+
+        treeTransform->addTransform(new Translation(glm::vec3(treeX, -1.0f, treeZ)));
+        treeTransform->addTransform(new Scale(glm::vec3(treeScale, treeScale, treeScale)));
+        drawableTree->setTransformation(treeTransform);
+        scene5Models.push_back(std::make_pair(drawableTree, treeTransform));
+    }
+    Scene* scene5 = createSceneWithModels(scene5Models, scene5Lights);
+    scenes.push_back(scene5);
+
+    
+    currentScene = scenes[4];
 }
 
 void App::switchScene(int sceneIndex)
@@ -353,7 +360,7 @@ void App::switchScene(int sceneIndex)
     {
         currentScene = scenes[sceneIndex];
 
-        currentScene->clearLights(); 
+        currentScene->clearLights();
 
         if (!currentScene->lightsInitialized())
         {
@@ -368,114 +375,11 @@ void App::switchScene(int sceneIndex)
 }
 
 
-void App::processInput()
-{
-    static bool fKeyWasPressed = false;
-    static bool escKeyWasPressed = false;
-
-    if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
-    {
-        if (!fKeyWasPressed)
-        {
-            currentScene->setFreezeSkyCube();
-            fKeyWasPressed = true;
-        }
-    }
-    else
-    {
-        fKeyWasPressed = false;
-    }
-
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        camera->moveForward();
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        camera->moveBackward();
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        camera->moveLeft();
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        camera->moveRight();
-
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-    {
-        if (!escKeyWasPressed)
-        {
-            isMouseCaptured = !isMouseCaptured;
-
-            if (isMouseCaptured)
-            {
-                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-                glfwSetCursorPos(window, 1200 / 2, 1000 / 2);
-            }
-            else
-            {
-                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-            }
-            escKeyWasPressed = true;
-        }
-    }
-    else
-    {
-        escKeyWasPressed = false;
-    }
-}
-
-
-void App::mouseCallback(double xpos, double ypos)
-{
-    if (!isMouseCaptured)
-    {
-        return;
-    }
-
-    int width, height;
-    glfwGetWindowSize(window, &width, &height);
-
-    float xoffset = xpos - (width / 2);
-    float yoffset = (height / 2) - ypos;
-
-    glfwSetCursorPos(window, width / 2, height / 2);
-
-    camera->updatePosition(xoffset, yoffset);
-}
-//ok
-void App::mouseButtonCallback(int button, int action, int mods)
-{
-    if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
-    {
-        double xpos, ypos;
-        glfwGetCursorPos(window, &xpos, &ypos);
-
-        int width, height;
-        glfwGetWindowSize(window, &width, &height);
-
-        ypos = height - ypos;
-
-        GLbyte color[4];
-        GLfloat depth;
-        GLuint stencil;
-
-        glReadPixels(static_cast<GLint>(xpos), static_cast<GLint>(ypos), 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, color);
-        glReadPixels(static_cast<GLint>(xpos), static_cast<GLint>(ypos), 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
-        glReadPixels(static_cast<GLint>(xpos), static_cast<GLint>(ypos), 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_INT, &stencil);
-
-        if (stencil != 0)
-        {
-            glm::vec3 screenPos(xpos, ypos, depth);
-            glm::vec3 worldPos = glm::unProject(screenPos,
-                                                camera->getViewMatrix(),
-                                                camera->getProjectionMatrix(),
-                                                glm::vec4(0, 0, width, height));
-            addTreeAtPosition(worldPos);
-        }
-    }
-}
-
-
 void App::addTreeAtPosition(const glm::vec3& position)
 {
     ModelFactory modelFactory;
     AbstractObject* treeModelInstance = dynamic_cast<Model*>(modelFactory.createModel(
-       BASIC, tree, sizeof(tree) / sizeof(tree[0])));
+        BASIC, tree, sizeof(tree) / sizeof(tree[0])));
 
     auto drawableTree = new DrawableObject(treeModelInstance, shaderPhong);
     drawableTree->setMaterial(glowingMaterial);
@@ -496,35 +400,44 @@ void App::run()
     glClear(GL_STENCIL_BUFFER_BIT);
     while (!glfwWindowShouldClose(window))
     {
-        processInput();
+        controller->processInput();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        
+
         currentScene->draw();
         glfwPollEvents();
 
         if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
         {
-            camera->attach(light4);
+            camera->attach(flashlight);
             switchScene(0);
         }
         else if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
         {
-            camera->attach(light5);
+            camera->attach(flashlight);
             switchScene(1);
         }
         else if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
         {
-            camera->attach(light4);
+            camera->attach(flashlight);
             switchScene(2);
         }
         else if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
         {
-            camera->attach(light4);
+            camera->attach(flashlight);
             switchScene(3);
+        }
+        else if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
+        {
+            camera->attach(flashlight);
+            switchScene(4);
+        }
+
+        if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
+        {
+            currentScene->setFreezeSkyCube();
         }
 
         glfwSwapBuffers(window);
     }
     glDisable(GL_STENCIL_TEST);
-
 }

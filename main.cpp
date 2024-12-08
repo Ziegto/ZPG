@@ -7,6 +7,7 @@ int main(void)
 
     app->createLights();
     app->createShaders();
+    app->attachLightsToShaders();
     app->createModels();
     app->run();
 }

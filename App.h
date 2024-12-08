@@ -31,16 +31,11 @@ public:
     void createModels();
     void run();
     void switchScene(int sceneIndex);
-    void processInput();
-    void mouseCallback(double xpos, double ypos);
     Scene* createSceneWithModels(const std::vector<std::pair<DrawableObject*, ComposedTransform*>>& models,
                                  const std::vector<Light*>& lights);
     void createLights();
-
-    static void window_size_callback(GLFWwindow* window, int width, int height);
-    void mouseButtonCallback(int button, int action, int mods);
     void addTreeAtPosition(const glm::vec3& position);
-    
+    void attachLightsToShaders();    
 private:
     bool isMouseCaptured = true;
     GLFWwindow* window;
@@ -61,12 +56,14 @@ private:
     ShaderProgram* shaderBlinn;
     ShaderProgram* shaderSkyCube;
     ShaderProgram* shaderHouse;
+    ShaderProgram* shaderPhongNight;
     
     Light* light;
     Light* light2;
     Light* light3;
     Light* light4;
     Light* light5;
+    Light* flashlight;
 
     std::vector<std::pair<DrawableObject*, ComposedTransform*>> scene1Models;
     std::vector<std::pair<DrawableObject*, ComposedTransform*>> scene2Models;

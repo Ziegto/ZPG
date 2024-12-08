@@ -137,6 +137,7 @@
         <ClCompile Include="Camera.cpp"/>
         <ClCompile Include="ComposedTransform.cpp"/>
         <ClCompile Include="ModelFactory.cpp" />
+        <ClCompile Include="Controller.cpp" />
         <ClCompile Include="SkyCube.cpp" />
         <ClCompile Include="Drawable.cpp" />
         <ClCompile Include="DrawableObject.cpp"/>
@@ -163,6 +164,7 @@
         <ClInclude Include="Camera.h"/>
         <ClInclude Include="ComposedTransform.h"/>
         <ClInclude Include="ModelFactory.h" />
+        <ClInclude Include="Controller.h" />
         <ClInclude Include="SkyCube.h" />
         <ClInclude Include="Drawable.h" />
         <ClInclude Include="DrawableObject.h"/>
@@ -193,33 +195,33 @@
         <None Include="fragment_2d.glsl"/>
         <None Include="fragment_blinn.glsl"/>
         <None Include="fragment_constant.glsl"/>
+        <None Include="fragment_night.glsl" />
         <None Include="fragment_phong.glsl"/>
         <None Include="fragment_lambert.glsl"/>
         <None Include="vertex_2d.glsl"/>
         <None Include="vertex_blinn.glsl"/>
         <None Include="vertex_constant.glsl"/>
         <None Include="vertex_lambert.glsl"/>
+        <None Include="vertex_night.glsl" />
         <None Include="vertex_phong.glsl"/>
     </ItemGroup>
     <ItemGroup>
         <Content Include=".gitignore"/>
-        <Content Include="3DModels\Axe.obj" />
         <Content Include="3DModels\cube.obj" />
-        <Content Include="3DModels\house.blend" />
-        <Content Include="3DModels\house.mtl" />
         <Content Include="3DModels\house.obj" />
         <Content Include="3DModels\login.obj" />
+        <Content Include="3DModels\Penguin.obj" />
         <Content Include="3DModels\zombie.obj" />
         <Content Include="PhongFragmentShader.glsl" />
         <Content Include="phongTextureVertex.glsl" />
         <Content Include="PhongVertexShader.glsl" />
         <Content Include="phongTextureFragment.glsl" />
-        <Content Include="Structures\axe.png" />
         <Content Include="Structures\grass.png" />
         <Content Include="Structures\house.png" />
         <Content Include="Structures\negx.jpg" />
         <Content Include="Structures\negy.jpg" />
         <Content Include="Structures\negz.jpg" />
+        <Content Include="Structures\penguin.png" />
         <Content Include="Structures\posx.jpg" />
         <Content Include="Structures\posy.jpg" />
         <Content Include="Structures\posz.jpg" />
