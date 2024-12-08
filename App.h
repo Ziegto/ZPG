@@ -39,6 +39,8 @@ public:
 
     static void window_size_callback(GLFWwindow* window, int width, int height);
     void mouseButtonCallback(int button, int action, int mods);
+    void addTreeAtPosition(const glm::vec3& position);
+    
 private:
     bool isMouseCaptured = true;
     GLFWwindow* window;

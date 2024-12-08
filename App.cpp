@@ -352,23 +352,30 @@ void App::switchScene(int sceneIndex)
     if (sceneIndex >= 0 && sceneIndex < scenes.size())
     {
         currentScene = scenes[sceneIndex];
-    }
-    scenes[sceneIndex]->initLight();
-    if (sceneIndex == 0)
-    {
-        scenes[sceneIndex]->setSkyEnabled(true);
+
+        currentScene->clearLights(); 
+
+        if (!currentScene->lightsInitialized())
+        {
+            scenes[sceneIndex]->initLight();
+        }
+
+        if (sceneIndex == 0)
+        {
+            scenes[sceneIndex]->setSkyEnabled(true);
+        }
     }
 }
 
+
 void App::processInput()
 {
-    static bool fKeyWasPressed = false; // Stav klávesy F
-    static bool escKeyWasPressed = false; // Stav klávesy ESC
+    static bool fKeyWasPressed = false;
+    static bool escKeyWasPressed = false;
 
-    // Zpracování klávesy F (jednorázová akce)
     if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
     {
-        if (!fKeyWasPressed) // Pokud nebyla předtím stisknuta
+        if (!fKeyWasPressed)
         {
             currentScene->setFreezeSkyCube();
             fKeyWasPressed = true;
@@ -376,10 +383,9 @@ void App::processInput()
     }
     else
     {
-        fKeyWasPressed = false; // Reset, když F není stisknutá
+        fKeyWasPressed = false;
     }
 
-    // Zpracování pohybu (opakující se akce při držení kláves)
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         camera->moveForward();
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
@@ -389,10 +395,9 @@ void App::processInput()
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         camera->moveRight();
 
-    // Zpracování ESC (přepínání zachycení myši)
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     {
-        if (!escKeyWasPressed) // Pokud nebyla předtím stisknuta
+        if (!escKeyWasPressed)
         {
             isMouseCaptured = !isMouseCaptured;
 
@@ -410,7 +415,7 @@ void App::processInput()
     }
     else
     {
-        escKeyWasPressed = false; // Reset, když ESC není stisknutá
+        escKeyWasPressed = false;
     }
 }
 
@@ -432,31 +437,68 @@ void App::mouseCallback(double xpos, double ypos)
 
     camera->updatePosition(xoffset, yoffset);
 }
-
+//ok
 void App::mouseButtonCallback(int button, int action, int mods)
 {
     if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
     {
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    }
-    else if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
-    {
-    }
-    else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE)
-    {
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        double xpos, ypos;
+        glfwGetCursorPos(window, &xpos, &ypos);
+
+        int width, height;
+        glfwGetWindowSize(window, &width, &height);
+
+        ypos = height - ypos;
+
+        GLbyte color[4];
+        GLfloat depth;
+        GLuint stencil;
+
+        glReadPixels(static_cast<GLint>(xpos), static_cast<GLint>(ypos), 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, color);
+        glReadPixels(static_cast<GLint>(xpos), static_cast<GLint>(ypos), 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
+        glReadPixels(static_cast<GLint>(xpos), static_cast<GLint>(ypos), 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_INT, &stencil);
+
+        if (stencil != 0)
+        {
+            glm::vec3 screenPos(xpos, ypos, depth);
+            glm::vec3 worldPos = glm::unProject(screenPos,
+                                                camera->getViewMatrix(),
+                                                camera->getProjectionMatrix(),
+                                                glm::vec4(0, 0, width, height));
+            addTreeAtPosition(worldPos);
+        }
     }
 }
 
 
+void App::addTreeAtPosition(const glm::vec3& position)
+{
+    ModelFactory modelFactory;
+    AbstractObject* treeModelInstance = dynamic_cast<Model*>(modelFactory.createModel(
+       BASIC, tree, sizeof(tree) / sizeof(tree[0])));
+
+    auto drawableTree = new DrawableObject(treeModelInstance, shaderPhong);
+    drawableTree->setMaterial(glowingMaterial);
+
+    auto treeTransform = new ComposedTransform();
+    treeTransform->addTransform(new Translation(position));
+    treeTransform->addTransform(new Scale(glm::vec3(0.4f, 0.4f, 0.4f)));
+
+    drawableTree->setTransformation(treeTransform);
+
+    currentScene->addObject(drawableTree, GL_TRIANGLES, 0, sizeof(tree) / (6 * sizeof(float)));
+}
+
 void App::run()
 {
     glEnable(GL_DEPTH_TEST);
-
+    glEnable(GL_STENCIL_TEST);
+    glClear(GL_STENCIL_BUFFER_BIT);
     while (!glfwWindowShouldClose(window))
     {
         processInput();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        
         currentScene->draw();
         glfwPollEvents();
 
@@ -483,4 +525,6 @@ void App::run()
 
         glfwSwapBuffers(window);
     }
+    glDisable(GL_STENCIL_TEST);
+
 }

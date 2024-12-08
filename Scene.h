@@ -25,6 +25,9 @@ public:
 
     void setFreezeSkyCube();
 
+    bool lightsInitialized() const;
+
+    void clearLights();
 private:
     std::vector<DrawableObject*> objects;
     std::vector<std::pair<DrawableObject*, ComposedTransform*>> modelData;
@@ -41,4 +44,6 @@ private:
     DrawableObject* skyCubeDrawable;
     ShaderProgram* shaderSkyCube;
     int freezeSkyCube = 0;
+    bool lightsInitializedFlag = false;
+
 };

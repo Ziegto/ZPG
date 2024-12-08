@@ -40,10 +40,14 @@ std::vector<ComposedTransform*> Scene::getTransforms() const
 
 void Scene::initLight()
 {
-    for (int i = 0; i < lights.size(); i++)
+    if (!lightsInitializedFlag)
     {
-        lights[i]->setId(i);
-        lights[i]->notify();
+        for (int i = 0; i < lights.size(); i++)
+        {
+            lights[i]->setId(i);
+            lights[i]->notify();
+        }
+        lightsInitializedFlag = true;
     }
 }
 
@@ -76,8 +80,20 @@ void Scene::setFreezeSkyCube()
     }
 }
 
+bool Scene::lightsInitialized() const
+{
+    return lightsInitializedFlag;
+}
+
+void Scene::clearLights()
+{
+    lightsInitializedFlag = false;
+}
+
 void Scene::draw()
 {
+    
+
     if (sky)
     {
         ShaderProgram* currentShader = skyCubeDrawable->getShader();
@@ -95,6 +111,9 @@ void Scene::draw()
         DrawableObject* object = objects[i];
         ShaderProgram* currentShader = object->getShader();
         Material* material = object->getMaterial();
+
+        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+        glStencilFunc(GL_ALWAYS, static_cast<GLuint>(i + 1), 0xFF);
 
         currentShader->setNumberLights(lights.size());
         currentShader->use();
@@ -117,8 +136,8 @@ void Scene::draw()
 
         object->draw(modes[i], starts[i], counts[i]);
     }
-}
 
+}
 
 DrawableObject* Scene::getObject(int index)
 {
