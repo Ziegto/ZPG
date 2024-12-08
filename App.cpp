@@ -26,6 +26,7 @@ Camera* camera;
 Material* matteMaterial;
 Material* shinyMaterial;
 Material* glowingMaterial;
+Material* phongMaterial;
 Controller* controller;
 
 App::App()
@@ -88,12 +89,14 @@ void App::initialization()
 
 void App::createLights()
 {
-    light = new Light(glm::vec3(1.0f, 1.0f, 2.0f), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f), 1);
-    light2 = new Light(glm::vec3(0.f, 0.f, 0.f), glm::vec4(0.2f, 0.2f, 0.2f, 1.0f), 1);
-    light3 = new Light(glm::vec3(0.0f, 0.0f, 2.0f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), 1);
-    light4 = new Light(glm::vec3(0.0f, 0.0f, 2.0f), glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), 1);
-    light5 = new Light(glm::vec3(0.0f, 0.0f, 2.0f), glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), 1);
-    flashlight = new Light(glm::vec3(0.0f, 0.0f, 2.0f), glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), 1);
+    light = new Light(glm::vec3(2.0f, 5.0f, 2.0f), glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), 0);
+    light2 = new Light(glm::vec3(0.f, 0.f, 0.f), glm::vec4(0.2f, 0.2f, 0.2f, 1.0f), 0);
+    light3 = new Light(glm::vec3(0.0f, 0.0f, 2.0f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), 0);
+    light4 = new Light(glm::vec3(0.0f, 0.0f, 2.0f), glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), 0);
+    light5 = new Light(glm::vec3(0.0f, 0.0f, 2.0f), glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), 0);
+    flashlight = new Light(glm::vec3(0.0f, 10.0f, 0.0f), glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), 1);
+    none = new Light(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec4(0.f,0.f,0.f,0.f), 0); 
+
 }
 
 
@@ -101,24 +104,29 @@ void App::createShaders()
 {
     shaderLambert = new ShaderProgram("vertex_lambert.glsl", "fragment_lambert.glsl");
     shaderTriangle = new ShaderProgram("vertex_2d.glsl", "fragment_2d.glsl");
+    
     shaderPhong = new ShaderProgram("vertex_phong.glsl", "fragment_phong.glsl");
+    shaderPhongTexture = new ShaderProgram("phongTextureVertex.glsl", "phongTextureFragment.glsl");
+    
     shaderBlinn = new ShaderProgram("vertex_blinn.glsl", "fragment_blinn.glsl");
     shaderConstant = new ShaderProgram("vertex_constant.glsl", "fragment_constant.glsl");
     shaderSkyCube = new ShaderProgram("PhongVertexShader.glsl", "PhongFragmentShader.glsl");
+    
     shaderPhongNight = new ShaderProgram("vertex_night.glsl", "fragment_night.glsl");
+    shaderPhongTextureNight = new ShaderProgram("phongTextureVertexNight.glsl", "phongTextureFragmentNight.glsl");
 
      matteMaterial = new Material(glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.7f, 0.5f, 0.5f), glm::vec3(0.0f, 0.0f, 0.0f));
-    shinyMaterial = new Material(glm::vec3(0.3f, 0.3f, 0.3f), glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(1.0f, 1.0f, 1.0f));
-    glowingMaterial = new Material(glm::vec3(0.2f, 0.2f, 0.2f), glm::vec3(0.9f, 0.9f, 0.5f),
-                                   glm::vec3(0.f, 0.f,0.f));
-
+    shinyMaterial = new Material(glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(1.0f, 1.0f, 1.0f));
+    glowingMaterial = new Material(glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.9f, 0.9f, 0.9f), glm::vec3(0.f, 0.f,0.f));
+    phongMaterial = new Material(glm::vec3(0.5f, 0.5f, 0.2f), glm::vec3(0.9f, 0.9f, 0.5f),
+                                       glm::vec3(2.0f, 2.0f, 1.0f));
 }
 
 void App::attachLightsToShaders()
 {
-    std::vector<Light*> lights = {flashlight};
+    std::vector<Light*> lights = {light, light2, light3, light4, light5, flashlight};
 
-    std::vector<ShaderProgram*> shaders = {shaderLambert, shaderConstant, shaderPhong, shaderBlinn, shaderSkyCube, shaderPhongNight};
+    std::vector<ShaderProgram*> shaders = {shaderPhongTexture, shaderLambert, shaderConstant, shaderPhong, shaderBlinn, shaderSkyCube, shaderPhongNight,shaderPhongTextureNight };
 
     for (auto& l : lights)
     {
@@ -140,6 +148,7 @@ Scene* App::createSceneWithModels(const std::vector<std::pair<DrawableObject*, C
         camera->attach(object->getShader());
         scene->addObject(object, GL_TRIANGLES, 0, sizeof(tree) / (6 * sizeof(float)));
     }
+    
     for (const auto& light : lights)
     {
         scene->addLight(light);
@@ -150,9 +159,10 @@ Scene* App::createSceneWithModels(const std::vector<std::pair<DrawableObject*, C
 
 void App::createModels()
 {
-    std::vector<Light*> scene1Lights = {flashlight, light};
-    std::vector<Light*> scene2Lights = {flashlight};
-    std::vector<Light*> scene4Lights = {flashlight};
+
+    std::vector<Light*> scene1Lights = {light, };
+    std::vector<Light*> scene2Lights = {light, light5, light4};
+    std::vector<Light*> scene4Lights = {light, light4};
     std::vector<Light*> scene5Lights = {flashlight};
     
     ModelFactory modelFactory;
@@ -179,7 +189,7 @@ void App::createModels()
         "./3DModels/Penguin.obj", GL_TRIANGLES));
 
     //les
-    auto drawablePlain = new DrawableObject(plainModelInstance, shaderLambert);
+    auto drawablePlain = new DrawableObject(plainModelInstance, shaderPhongTexture);
     drawablePlain->setTexture(0, "./Structures/grass.png");
     drawablePlain->setMaterial(glowingMaterial);
     auto plainTransform = new ComposedTransform();
@@ -188,7 +198,7 @@ void App::createModels()
     drawablePlain->setTransformation(plainTransform);
     scene1Models.push_back(std::make_pair(drawablePlain, plainTransform));
 
-    auto drawableHouse = new DrawableObject(assimpModelInstance, shaderLambert);
+    auto drawableHouse = new DrawableObject(assimpModelInstance, shaderPhongTexture);
     drawableHouse->setTexture(1, "./Structures/house.png");
     drawableHouse->setMaterial(glowingMaterial);
     auto houseTransform = new ComposedTransform();
@@ -197,7 +207,7 @@ void App::createModels()
     drawableHouse->setTransformation(houseTransform);
     scene1Models.push_back(std::make_pair(drawableHouse, houseTransform));
 
-    auto drawableLogin = new DrawableObject(assimpModelLoginInstance, shaderLambert);
+    auto drawableLogin = new DrawableObject(assimpModelLoginInstance, shaderPhongTexture);
     drawableLogin->setTexture(2, "./Structures/wooden_fence.png");
     drawableLogin->setMaterial(glowingMaterial);
     auto loginTransform = new ComposedTransform();
@@ -258,13 +268,12 @@ void App::createModels()
     scenes.push_back(scene1);
 
 
-    // 4 koule
+    // 4 sphere
     for (int i = 0; i < 4; i++)
     {
         auto drawableSphere = new DrawableObject(sphereModelInstance, shaderPhong);
-        drawableSphere->setMaterial(glowingMaterial);
+        drawableSphere->setMaterial(phongMaterial);
         auto sphereTransform = new ComposedTransform();
-
         Bezier* bezierTranslate = new Bezier(0.01f, 0.5f, glm::mat4(glm::vec4(-10.0, 30.0, -30.0, 1.0),
         glm::vec4(30.0, -60.0, 30.0, 0),
         glm::vec4(-30.0, 30.0, 0, 0),
@@ -272,8 +281,6 @@ void App::createModels()
         glm::vec3(0, 1, 0),
         glm::vec3(0, -1, 0),
         glm::vec3(1, 0, 0)));
-
-        
         sphereTransform->addTransform(bezierTranslate);
         sphereTransform->addTransform(new Translation(glm::vec3((i % 2) * 3 - 1.5f, (i / 2) * 3 - 1.5f, 0.5f)));
         drawableSphere->setTransformation(sphereTransform);
@@ -284,13 +291,13 @@ void App::createModels()
     scenes.push_back(scene2);
 
 
-    //trojuhelnik
+    //triangle
     auto drawableTriangle = new DrawableObject(triangleModelInstace, shaderTriangle);
     auto scene3 = new Scene(camera);
     scene3->addObject(drawableTriangle, GL_TRIANGLES, 0, sizeof(triangle) / (3 * sizeof(float)));
     scenes.push_back(scene3);
 
-    //4 objekty vedle sebe
+    //objects in line
     //..1
     auto drawableObject1 = new DrawableObject(sphereModelInstance, shaderPhong);
     drawableObject1->setMaterial(shinyMaterial);
@@ -310,31 +317,32 @@ void App::createModels()
     drawableObject2->setTransformation(transform2);
     scene4Models.push_back(std::make_pair(drawableObject2, transform2));
     //..3
-    // auto drawableObject3 = new DrawableObject(plainModelInstance, shaderLambert);
-    // drawableObject3->setTexture(4, "./Structures/wooden_fence.png");
-    // drawableObject3->setMaterial(glowingMaterial);
-    // auto transform3 = new ComposedTransform();
-    // transform3->addTransform(new Translation(glm::vec3(6.f, -0.5f, 0.f)));
-    // transform3->addTransform(new Scale(glm::vec3(1.5f, 1.5f, 1.5f)));
-    // transform3->addTransform(new DynamicRotation(45.0f, glm::vec3(0.0f, 1.0f, 0.0f)));
-    // drawableObject3->setTransformation(transform3);
-    // scene4Models.push_back(std::make_pair(drawableObject3, transform3));
-    //..4
-    auto drawableObject4 = new DrawableObject(treeModelInstance, shaderConstant);
-    drawableObject4->setMaterial(glowingMaterial);
-    auto transform4 = new ComposedTransform();
-    transform4->addTransform(new Translation(glm::vec3(9.f, -0.5f, 0.f)));
-    transform4->addTransform(new Scale(glm::vec3(0.5f, 0.5f, 0.5f)));
-    transform4->addTransform(new DynamicRotation(45.0f, glm::vec3(0.0f, 1.0f, 0.0f)));
-    drawableObject4->setTransformation(transform4);
-    scene4Models.push_back(std::make_pair(drawableObject4, transform4));
+    auto drawableObject3 = new DrawableObject(plainModelInstance, shaderLambert);
+    drawableObject3->setTexture(4, "./Structures/wooden_fence.png");
+    drawableObject3->setMaterial(glowingMaterial);
+    auto transform3 = new ComposedTransform();
+    transform3->addTransform(new Translation(glm::vec3(6.f, -0.5f, 0.f)));
+    transform3->addTransform(new Scale(glm::vec3(1.5f, 1.5f, 1.5f)));
+    transform3->addTransform(new DynamicRotation(45.0f, glm::vec3(0.0f, 1.0f, 0.0f)));
+    drawableObject3->setTransformation(transform3);
+    scene4Models.push_back(std::make_pair(drawableObject3, transform3));
+    // //..4
+    // auto drawableObject4 = new DrawableObject(treeModelInstance, shaderConstant);
+    // drawableObject4->setMaterial(glowingMaterial);
+    // auto transform4 = new ComposedTransform();
+    // transform4->addTransform(new Translation(glm::vec3(9.f, -0.5f, 0.f)));
+    // transform4->addTransform(new Scale(glm::vec3(0.5f, 0.5f, 0.5f)));
+    // transform4->addTransform(new DynamicRotation(45.0f, glm::vec3(0.0f, 1.0f, 0.0f)));
+    // drawableObject4->setTransformation(transform4);
+    // scene4Models.push_back(std::make_pair(drawableObject4, transform4));
     Scene* scene4 = createSceneWithModels(scene4Models, scene4Lights);
     scenes.push_back(scene4);
-    
+
+    //night forest
     for (int i = 0; i < 50; i++)
     {
-        auto drawableTree = new DrawableObject(treeModelInstance, shaderPhong);
-        drawableTree->setMaterial(matteMaterial);
+        auto drawableTree = new DrawableObject(treeModelInstance, shaderPhongNight);
+        drawableTree->setMaterial(glowingMaterial);
 
         auto treeTransform = new ComposedTransform();
 
@@ -347,11 +355,30 @@ void App::createModels()
         drawableTree->setTransformation(treeTransform);
         scene5Models.push_back(std::make_pair(drawableTree, treeTransform));
     }
+
+    auto drawableePlain = new DrawableObject(plainModelInstance, shaderLambert);
+    drawableePlain->setTexture(0, "./Structures/grass.png");
+    drawableePlain->setMaterial(glowingMaterial);
+    auto plainnTransform = new ComposedTransform();
+    plainnTransform->addTransform(new Translation(glm::vec3(0.f, -1.0f, 0.f)));
+    plainnTransform->addTransform(new Scale(glm::vec3(30.f, 30.f, 30.f)));
+    drawableePlain->setTransformation(plainnTransform);
+    scene5Models.push_back(std::make_pair(drawableePlain, plainnTransform));
+
+    auto drawableeHouse = new DrawableObject(assimpModelInstance, shaderLambert);
+    drawableeHouse->setTexture(1, "./Structures/house.png");
+    drawableeHouse->setMaterial(glowingMaterial);
+    auto houseeTransform = new ComposedTransform();
+    houseeTransform->addTransform(new Translation(glm::vec3(0.f, -1.0f, 0.f)));
+    houseeTransform->addTransform(new Scale(glm::vec3(0.5f, 0.5f, 0.5f)));
+    drawableHouse->setTransformation(houseeTransform);
+    scene5Models.push_back(std::make_pair(drawableeHouse, houseeTransform));
+    
     Scene* scene5 = createSceneWithModels(scene5Models, scene5Lights);
     scenes.push_back(scene5);
 
     
-    currentScene = scenes[4];
+    currentScene = scenes[2];
 }
 
 void App::switchScene(int sceneIndex)
@@ -408,28 +435,28 @@ void App::run()
 
         if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
         {
-            camera->attach(flashlight);
             switchScene(0);
+            camera->attach(none);
         }
         else if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
         {
-            camera->attach(flashlight);
             switchScene(1);
+            camera->attach(none);
         }
         else if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
         {
-            camera->attach(flashlight);
             switchScene(2);
+            camera->attach(none);
         }
         else if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
         {
-            camera->attach(flashlight);
             switchScene(3);
+            camera->attach(none);
         }
         else if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
         {
-            camera->attach(flashlight);
             switchScene(4);
+            camera->attach(flashlight);
         }
 
         if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)

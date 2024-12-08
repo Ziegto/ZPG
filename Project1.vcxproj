@@ -213,9 +213,11 @@
         <Content Include="3DModels\Penguin.obj" />
         <Content Include="3DModels\zombie.obj" />
         <Content Include="PhongFragmentShader.glsl" />
-        <Content Include="phongTextureVertex.glsl" />
-        <Content Include="PhongVertexShader.glsl" />
         <Content Include="phongTextureFragment.glsl" />
+        <Content Include="phongTextureFragmentNight.glsl" />
+        <Content Include="phongTextureVertex.glsl" />
+        <Content Include="phongTextureVertexNight.glsl" />
+        <Content Include="PhongVertexShader.glsl" />
         <Content Include="Structures\grass.png" />
         <Content Include="Structures\house.png" />
         <Content Include="Structures\negx.jpg" />
@@ -227,8 +229,6 @@
         <Content Include="Structures\posz.jpg" />
         <Content Include="Structures\wooden_fence.png" />
         <Content Include="Structures\zombie.png" />
-        <Content Include="test_frag.glsl" />
-        <Content Include="test_vert.glsl" />
         <Content Include="tree.obj" />
         <Content Include="tree.png" />
     </ItemGroup>

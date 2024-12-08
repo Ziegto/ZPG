@@ -74,6 +74,7 @@ glm::vec3 Light::getLightPosition()
 void Light::setId(int id)
 {
     this->id = id;
+    std::cout << "Light id: " << id << std::endl;
 }
 
 int Light::getId()

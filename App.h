@@ -55,8 +55,9 @@ private:
     ShaderProgram* shaderPhong;
     ShaderProgram* shaderBlinn;
     ShaderProgram* shaderSkyCube;
-    ShaderProgram* shaderHouse;
     ShaderProgram* shaderPhongNight;
+    ShaderProgram* shaderPhongTexture;
+    ShaderProgram* shaderPhongTextureNight;
     
     Light* light;
     Light* light2;
@@ -64,6 +65,7 @@ private:
     Light* light4;
     Light* light5;
     Light* flashlight;
+    Light* none;
 
     std::vector<std::pair<DrawableObject*, ComposedTransform*>> scene1Models;
     std::vector<std::pair<DrawableObject*, ComposedTransform*>> scene2Models;
