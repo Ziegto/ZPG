@@ -21,7 +21,7 @@ struct Material {
 };
 
 uniform int numLights;
-uniform Light lights[100];
+uniform Light lights[10];
 uniform Material material;
 
 void main(void)

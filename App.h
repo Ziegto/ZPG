@@ -31,7 +31,7 @@ public:
     void createModels();
     void run();
     void switchScene(int sceneIndex);
-    Scene* createSceneWithModels(const std::vector<std::pair<DrawableObject*, ComposedTransform*>>& models,
+    Scene* createSceneWithModels(const std::vector<DrawableObject*>& models,
                                  const std::vector<Light*>& lights);
     void createLights();
     void addTreeAtPosition(const glm::vec3& position);
@@ -58,20 +58,23 @@ private:
     ShaderProgram* shaderPhongNight;
     ShaderProgram* shaderPhongTexture;
     ShaderProgram* shaderPhongTextureNight;
+    ShaderProgram* shaderSpherePhong;
     
     Light* light;
     Light* light2;
     Light* light3;
     Light* light4;
     Light* light5;
+    Light* light6;
     Light* flashlight;
     Light* none;
 
-    std::vector<std::pair<DrawableObject*, ComposedTransform*>> scene1Models;
-    std::vector<std::pair<DrawableObject*, ComposedTransform*>> scene2Models;
-    std::vector<std::pair<DrawableObject*, ComposedTransform*>> scene3Models;
-    std::vector<std::pair<DrawableObject*, ComposedTransform*>> scene4Models;
-    std::vector<std::pair<DrawableObject*, ComposedTransform*>> scene5Models;
+    std::vector<DrawableObject*> scene1Models;
+    std::vector<DrawableObject*> scene2Models;
+    std::vector<DrawableObject*> scene3Models;
+    std::vector<DrawableObject*> scene4Models;
+    std::vector<DrawableObject*> scene5Models;
+
 };
 
 #endif
