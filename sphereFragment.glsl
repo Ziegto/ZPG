@@ -46,12 +46,11 @@ void main(void)
 
         if (diffIntensity > 0.0) {
             vec3 reflectDir = reflect(-lightDir, normal);
-            float spec = pow(max(dot(viewDir, reflectDir), 0.0), 8.0);
+            float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
             vec4 specularColor = specularStrength * spec * lights[i].color * vec4(material.rs, 1.0) * attenuation;
             totalSpecular += specularColor;
         }
 
-        // Spotlight handling
         if (lights[i].type == 1) {
             float cutoff = cos(radians(20));
             float theta = dot(normalize(-lightDir), lights[i].spotDir);

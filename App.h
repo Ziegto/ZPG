@@ -35,7 +35,8 @@ public:
                                  const std::vector<Light*>& lights);
     void createLights();
     void addTreeAtPosition(const glm::vec3& position);
-    void attachLightsToShaders();    
+    void attachLightsToShaders();
+
 private:
     bool isMouseCaptured = true;
     GLFWwindow* window;
@@ -59,7 +60,7 @@ private:
     ShaderProgram* shaderPhongTexture;
     ShaderProgram* shaderPhongTextureNight;
     ShaderProgram* shaderSpherePhong;
-    
+
     Light* light;
     Light* light2;
     Light* light3;
@@ -68,13 +69,18 @@ private:
     Light* light6;
     Light* flashlight;
     Light* none;
+    Light* cameraLight;
 
+    Material* matteMaterial;
+    Material* shinyMaterial;
+    Material* glowingMaterial;
+    Material* phongMaterial;
+    
     std::vector<DrawableObject*> scene1Models;
     std::vector<DrawableObject*> scene2Models;
     std::vector<DrawableObject*> scene3Models;
     std::vector<DrawableObject*> scene4Models;
     std::vector<DrawableObject*> scene5Models;
-
 };
 
 #endif

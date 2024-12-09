@@ -13,7 +13,7 @@ struct Light {
     vec3 position;
     vec4 color;
     vec3 spotDir;
-    int type;
+    int type; // 0 = point light, 1 = spotlight
 };
 
 struct Material {
@@ -36,25 +36,42 @@ void main(void)
 
     for (int i = 0; i < numLights; ++i) {
         vec3 lightDir = normalize(lights[i].position - fragPosition);
-        float diffIntensity = max(dot(normal, lightDir), 0.0);
-        vec4 diffuseColor = diffIntensity * lights[i].color * vec4(material.rd, 1.0);
-        totalDiffuse += diffuseColor;
+        float distance = length(lights[i].position - fragPosition);
+        float constantAttenuation = 1.0;
+        float linearAttenuation = 0.09;
+        float quadraticAttenuation = 0.032;
+        float attenuation = 1.0 / (constantAttenuation + linearAttenuation * distance + quadraticAttenuation * distance * distance);
 
-        if (diffIntensity > 0.0) {
-            vec3 reflectDir = reflect(-lightDir, normal);
-            float spec = pow(max(dot(viewDir, reflectDir), 0.0), 8.0);
-            vec4 specularColor = specularStrength * spec * lights[i].color * vec4(material.rs, 1.0);
-            totalSpecular += specularColor;
-        }
+        if (lights[i].type == 0) {
+            // Point light
+            float diffIntensity = max(dot(normal, lightDir), 0.0);
+            vec4 diffuseColor = diffIntensity * lights[i].color * vec4(material.rd, 1.0) * attenuation;
+            totalDiffuse += diffuseColor;
 
-        // Spotlight handling
-        if (lights[i].type == 1) {
+            if (diffIntensity > 0.0) {
+                vec3 reflectDir = reflect(-lightDir, normal);
+                float spec = pow(max(dot(viewDir, reflectDir), 0.0), 8.0);
+                vec4 specularColor = specularStrength * spec * lights[i].color * vec4(material.rs, 1.0) * attenuation;
+                totalSpecular += specularColor;
+            }
+        } else if (lights[i].type == 1) {
+            // Spotlight
             float cutoff = cos(radians(25));
             float theta = dot(normalize(-lightDir), lights[i].spotDir);
             if (theta > cutoff) {
                 float intense = (theta - cutoff) / (1.0 - cutoff);
                 intense = clamp(intense, 0.0, 1.0);
+
+                float diffIntensity = max(dot(normal, lightDir), 0.0);
+                vec4 diffuseColor = diffIntensity * lights[i].color * vec4(material.rd, 1.0) * attenuation;
                 totalDiffuse += diffuseColor * intense;
+
+                if (diffIntensity > 0.0) {
+                    vec3 reflectDir = reflect(-lightDir, normal);
+                    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 8.0);
+                    vec4 specularColor = specularStrength * spec * lights[i].color * vec4(material.rs, 1.0) * attenuation;
+                    totalSpecular += specularColor * intense;
+                }
             }
         }
     }
